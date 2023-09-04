@@ -22,7 +22,20 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import android.util.Log
+import android.widget.Toast
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.height
+import androidx.compose.material3.FabPosition
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.modifier.modifierLocalConsumer
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 
 
 class MainActivity : ComponentActivity() {
@@ -38,16 +51,21 @@ class MainActivity : ComponentActivity() {
 @Preview(showBackground = true)
 @Composable
 fun ViewContainer() {
+
+
     Scaffold(topBar = { Toolbar() }, content = { paddingValues ->
         Log.d("ViewContainer", "$paddingValues")
         Content(paddingValues)
-    })
+    }, floatingActionButton = { Fab() }, floatingActionButtonPosition = FabPosition.End)
 }
 
 
-@PreviewParameter(PaddingValuesProvider::class)
+//@PreviewParameter(PaddingValuesProvider::class)
 @Composable
 fun Content(paddingValues: PaddingValues) {
+    var counter by rememberSaveable {
+        mutableStateOf(0)
+    }
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -60,6 +78,14 @@ fun Content(paddingValues: PaddingValues) {
         item {
 
             Image(painter = painterResource(id = R.drawable.androiddev), contentDescription = null)
+            Row(modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Blue)
+                .height(40.dp)
+                .padding(start = 10.dp, top = 10.dp, bottom = 10.dp)) {
+                Image(painter = painterResource(id = R.drawable.ic_favorite), contentDescription = "Like heart", modifier= Modifier.clickable { counter++  })
+                Text(text = counter.toString(), modifier= Modifier.padding(start = 5.dp) )
+            }
             // Generate text to test scrolling
             for (i in 1..40) {
                 Text(text = "Android App")
@@ -70,7 +96,6 @@ fun Content(paddingValues: PaddingValues) {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview
 @Composable
 fun Toolbar() {
     TopAppBar(
@@ -78,5 +103,13 @@ fun Toolbar() {
         colors = TopAppBarDefaults.topAppBarColors(Color.Magenta)
     )
 }
+@Composable
+fun Fab() {
+    val context = LocalContext.current
+    FloatingActionButton(onClick = {Toast.makeText(context, "Clicked", Toast.LENGTH_SHORT).show()}) {
+        Text(text = "X")
+    }
 
+
+}
 abstract class PaddingValuesProvider : PreviewParameterProvider<PaddingValues>
